@@ -1,5 +1,16 @@
 #include <iostream>
 
+bool CalcCommand(const char* a, const char* b) {
+  while (*a && *b && *a == *b) {
+    ++a;
+    ++b;
+  }
+  if (*a == *b) {
+    return true;
+  }
+  return false;
+}
+
 bool CalcDeposit(int& moneybox) {
   int k;
   std::cin >> k;
@@ -39,20 +50,16 @@ bool CaclInc(int& moneybox) {
 }
 
 int main() {
-  std::string command;
-  std::cin >> command;
+  char command[100];
   int moneybox{0};
-  int number;
-  std::string* table_name = new std::string[5]{
-    "deposit", "withdraw", "balance", "reset", "inc"
-  };
-  bool (**table_func)(int&) = new (bool (*[5])(int&)) {
-    CalcDeposit, CalcWithdraw, CalcBalance, CalcReset, CaclInc
-  };
-  while (command != "stop") {
+  char** table_name =
+      new char*[5]{"deposit", "withdraw", "balance", "reset", "inc"};
+  bool (**table_func)(int&) = new (bool (*[5])(int&)){
+      CalcDeposit, CalcWithdraw, CalcBalance, CalcReset, CaclInc};
+  while (std::cin >> command && !CalcCommand(command, "stop")) {
     bool error = true;
     for (int i{0}; i < 5; ++i) {
-      if (table_name[i] == command) {
+      if (CalcCommand(table_name[i], command)) {
         if (!table_func[i](moneybox)) {
           std::cout << "error" << "\n";
         }
@@ -62,7 +69,6 @@ int main() {
     if (error) {
       std::cout << "error" << "\n";
     }
-    std::cin >> command;
   }
   delete[] table_name;
   delete[] table_func;
